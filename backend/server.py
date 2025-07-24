@@ -345,8 +345,8 @@ async def get_all_packages(current_user: dict = Depends(get_current_user)):
 
 @app.post("/api/admin/update-status")
 async def update_package_status(update_data: TrackingUpdate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["admin", "delivery_agent"]:
-        raise HTTPException(status_code=403, detail="Access denied")
+    if current_user.get("role") not in ["admin", "delivery_agent"]:
+        raise HTTPException(status_code=403, detail=f"Access denied. Your role: {current_user.get('role', 'undefined')}")
     
     # Update package status
     packages_collection.update_one(
@@ -369,8 +369,8 @@ async def update_package_status(update_data: TrackingUpdate, current_user: dict 
 
 @app.get("/api/admin/stats")
 async def get_admin_stats(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail=f"Access denied. Your role: {current_user.get('role', 'undefined')}")
     
     total_packages = packages_collection.count_documents({})
     delivered_packages = packages_collection.count_documents({"status": "delivered"})
