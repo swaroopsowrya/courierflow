@@ -333,8 +333,12 @@ async def track_package(tracking_id: str):
 # Admin endpoints
 @app.get("/api/admin/packages")
 async def get_all_packages(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["admin", "delivery_agent"]:
-        raise HTTPException(status_code=403, detail="Access denied")
+    print(f"DEBUG: Current user data: {current_user}")
+    print(f"DEBUG: User role: {current_user.get('role', 'NOT_FOUND')}")
+    print(f"DEBUG: Available keys: {list(current_user.keys())}")
+    
+    if current_user.get("role") not in ["admin", "delivery_agent"]:
+        raise HTTPException(status_code=403, detail=f"Access denied. Your role: {current_user.get('role', 'undefined')}")
     
     packages = list(packages_collection.find({}, {"_id": 0}).sort("created_at", -1))
     return {"packages": packages}
